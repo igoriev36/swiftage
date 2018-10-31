@@ -1,0 +1,4 @@
+.cache
+.parcel-globals
+node_modules
+dist

@@ -1,0 +1,24 @@
+{
+  "name": "swift",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel public/index.html --no-hmr"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mobx": "^5.5.2",
+    "mobx-state-tree": "^3.7.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.93.5",
+    "parcel-bundler": "^1.10.3",
+    "typescript": "^3.1.4"
+  },
+  "alias": {
+    "three": ".parcel-globals/three.js"
+  }
+}

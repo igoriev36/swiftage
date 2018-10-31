@@ -1,7 +1,7 @@
 import { fromEvent, merge } from "rxjs";
 import { debounceTime, share, startWith, throttleTime } from "rxjs/operators";
 import * as THREE from "three";
-import "three-orbit-controls";
+import { addControls } from "./editor/controls";
 import Grid from "./models/grid";
 import Project from "./models/project";
 import Technology from "./models/technology";
@@ -247,16 +247,7 @@ merge(mouseMove$, wheel$, keyUp$, keyDown$, click$, resize$)
   )
   .subscribe(render);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableZoom = true;
-controls.enableDamping = true;
-controls.minDistance = 4;
-controls.maxDistance = 200;
-controls.dampingFactor = 0.25;
-controls.rotateSpeed = 0.4;
-(controls as any).panSpeed = 0.2;
-controls.minPolarAngle = 0.1;
-controls.maxPolarAngle = Math.PI / 2 - 0.15;
+const controls = addControls(camera, renderer.domElement);
 
 container.appendChild(renderer.domElement);
 

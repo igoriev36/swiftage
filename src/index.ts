@@ -2,9 +2,18 @@ import { fromEvent, merge } from "rxjs";
 import { debounceTime, share, startWith, throttleTime } from "rxjs/operators";
 import * as THREE from "three";
 import { addControls } from "./editor/controls";
-import Grid from "./models/grid";
-import Project from "./models/project";
-import Technology from "./models/technology";
+
+const pressedKeys = new Set();
+
+const GRID_SIZE = 3;
+const NUMBER_OF_GRIDS = 41;
+
+const objects = [];
+
+const meshMaterial = new THREE.MeshBasicMaterial({
+  wireframe: true,
+  color: "pink"
+});
 
 function make({
   gridX = 300,
@@ -38,30 +47,13 @@ make()
   });
 
 const extrudeSettings = {
-  depth: 12, //this.props.bay.length,
+  depth: GRID_SIZE * 4,
   bevelEnabled: false,
   steps: 1
 };
 const sgeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
-const swiftProject = Project.create({
-  name: "Almere",
-  technology: Technology.create({
-    id: "swift",
-    grids: [
-      Grid.create({
-        name: "minor",
-        x: 300,
-        z: 300
-      }),
-      Grid.create({
-        name: "major",
-        x: 1200,
-        z: 1200
-      })
-    ]
-  })
-});
+// setup 3D scene
 
 const scene = new THREE.Scene();
 const container = document.getElementById("scene");
@@ -78,11 +70,14 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor(0xeeeeee);
 renderer.shadowMap.enabled = true;
 
+// setup handlers
+
 function handleResize(event = null) {
   camera.aspect = container.clientWidth / container.clientHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(container.clientWidth, container.clientHeight);
 }
+
 const resize$ = fromEvent(window, "resize").pipe(
   debounceTime(50),
   share()
@@ -90,28 +85,28 @@ const resize$ = fromEvent(window, "resize").pipe(
 resize$.subscribe(handleResize);
 handleResize();
 
-const gridSize = 41;
-
-// var p = new THREE.Plane(new THREE.Vector3(0, 1, 0));
 var grid = new THREE.GridHelper(
-  gridSize * 3,
-  gridSize,
+  NUMBER_OF_GRIDS * GRID_SIZE,
+  NUMBER_OF_GRIDS,
   new THREE.Color(0xdddddd),
   new THREE.Color(0xdddddd)
 );
 grid.position.x = -1.5;
 grid.position.z = -1.5;
-// plane.rotateX(-Math.PI/2)
 scene.add(grid);
 
-var geometry = new THREE.PlaneBufferGeometry(gridSize * 3, gridSize * 3);
+var geometry = new THREE.PlaneBufferGeometry(
+  NUMBER_OF_GRIDS * GRID_SIZE,
+  NUMBER_OF_GRIDS * GRID_SIZE
+);
 geometry.rotateX(-Math.PI / 2);
-var plane = new THREE.Mesh(geometry, new THREE.ShadowMaterial({ opacity: 1 }));
-// plane.rotation.x = -Math.PI / 2;
+const plane = new THREE.Mesh(
+  geometry,
+  new THREE.ShadowMaterial({ opacity: 1 })
+);
 plane.receiveShadow = true;
+objects.push(plane);
 scene.add(plane);
-
-let objects = [plane];
 
 var mouse2D = { x: 0, y: 0 };
 var vector = new THREE.Vector3();
@@ -129,7 +124,14 @@ var cubeGeo = new THREE.BoxBufferGeometry(48, 12, 12);
 var cubeMat = new THREE.MeshLambertMaterial({
   color: 0xebcaa7
 });
-// var cubeMat = new THREE.MeshNormalMaterial();
+
+function render() {
+  requestAnimationFrame(animate);
+}
+
+function animate() {
+  renderer.render(scene, camera);
+}
 
 var rollOverMesh = new THREE.Mesh(
   cubeGeo,
@@ -139,10 +141,11 @@ var rollOverMesh = new THREE.Mesh(
     transparent: true
   })
 );
-// rollOverMesh.translateY(1.5);
 scene.add(rollOverMesh);
 
 let pos = new THREE.Vector3();
+
+container.appendChild(renderer.domElement);
 
 function handleMouseMove(event) {
   mouse2D.x = (event.clientX / container.clientWidth) * 2 - 1;
@@ -160,24 +163,13 @@ function handleMouseMove(event) {
       .floor()
       .multiplyScalar(12)
       .addScalar(6);
-    // pos.y += 1.5;
+
     rollOverMesh.position.copy(pos);
-    // .addScalar(1.5);
-    // console.log(intersects[0].point);
-    // const v = new THREE.Vector3().copy(intersects[0].point);
-    // const { x, z } = intersects[0].object.worldToLocal(v);
-    // console.log(x, z);
-    // console.log(intersects[0].object.localToWorld(v));
   }
 }
 
-const meshMaterial = new THREE.MeshBasicMaterial({
-  wireframe: true,
-  color: "pink"
-});
-
 function handleClick(event) {
-  if (downKeys.has("Shift") && intersects.length > 0) {
+  if (pressedKeys.has("Shift") && intersects.length > 0) {
     const cube = new THREE.Mesh(sgeo, cubeMat);
     cube.receiveShadow = true;
     cube.castShadow = true;
@@ -207,20 +199,15 @@ function handleClick(event) {
   }
 }
 
-let downKeys = new Set();
-
 function handleKeyDown(e) {
-  downKeys.add(e.key);
-
-  controls.enabled = !downKeys.has("Shift");
+  pressedKeys.add(e.key);
+  controls.enabled = !pressedKeys.has("Shift");
 }
+
 function handleKeyUp(e) {
-  downKeys.delete(e.key);
-  controls.enabled = !downKeys.has("Shift");
+  pressedKeys.delete(e.key);
+  controls.enabled = !pressedKeys.has("Shift");
 }
-
-const click$ = fromEvent(renderer.domElement, "click").pipe(share());
-click$.subscribe(handleClick);
 
 const keyDown$ = fromEvent(window, "keydown").pipe(share());
 keyDown$.subscribe(handleKeyDown);
@@ -228,17 +215,20 @@ keyDown$.subscribe(handleKeyDown);
 const keyUp$ = fromEvent(window, "keyup").pipe(share());
 keyUp$.subscribe(handleKeyUp);
 
+const wheel$ = fromEvent(renderer.domElement, "wheel");
+
+const click$ = fromEvent(renderer.domElement, "click").pipe(share());
+click$.subscribe(handleClick);
+
 const mouseMove$ = fromEvent(renderer.domElement, "mousemove").pipe(
   throttleTime(10),
   share()
 );
 mouseMove$.subscribe(handleMouseMove);
 
-const wheel$ = fromEvent(renderer.domElement, "wheel");
-
 merge(keyUp$, keyDown$)
   .pipe(startWith(null))
-  .subscribe(() => (rollOverMesh.visible = downKeys.has("Shift")));
+  .subscribe(() => (rollOverMesh.visible = pressedKeys.has("Shift")));
 
 merge(mouseMove$, wheel$, keyUp$, keyDown$, click$, resize$)
   .pipe(
@@ -248,13 +238,3 @@ merge(mouseMove$, wheel$, keyUp$, keyDown$, click$, resize$)
   .subscribe(render);
 
 const controls = addControls(camera, renderer.domElement);
-
-container.appendChild(renderer.domElement);
-
-function render() {
-  requestAnimationFrame(animate);
-}
-
-function animate() {
-  renderer.render(scene, camera);
-}

@@ -1,3 +1,5 @@
+import { fromEvent, merge } from "rxjs";
+import { debounceTime, share, startWith, throttleTime } from "rxjs/operators";
 import * as THREE from "three";
 import "three-orbit-controls";
 import Grid from "./models/grid";
@@ -81,8 +83,12 @@ function handleResize(event = null) {
   camera.updateProjectionMatrix();
   renderer.setSize(container.clientWidth, container.clientHeight);
 }
+const resize$ = fromEvent(window, "resize").pipe(
+  debounceTime(50),
+  share()
+);
+resize$.subscribe(handleResize);
 handleResize();
-window.addEventListener("resize", handleResize);
 
 const gridSize = 41;
 
@@ -98,7 +104,7 @@ grid.position.z = -1.5;
 // plane.rotateX(-Math.PI/2)
 scene.add(grid);
 
-var geometry = new THREE.PlaneGeometry(gridSize * 3, gridSize * 3);
+var geometry = new THREE.PlaneBufferGeometry(gridSize * 3, gridSize * 3);
 geometry.rotateX(-Math.PI / 2);
 var plane = new THREE.Mesh(geometry, new THREE.ShadowMaterial({ opacity: 1 }));
 // plane.rotation.x = -Math.PI / 2;
@@ -163,9 +169,12 @@ function handleMouseMove(event) {
     // console.log(x, z);
     // console.log(intersects[0].object.localToWorld(v));
   }
-
-  rollOverMesh.visible = downKeys.has("Shift");
 }
+
+const meshMaterial = new THREE.MeshBasicMaterial({
+  wireframe: true,
+  color: "pink"
+});
 
 function handleClick(event) {
   if (downKeys.has("Shift") && intersects.length > 0) {
@@ -180,7 +189,7 @@ function handleClick(event) {
         s.max.y - s.min.y,
         s.max.z - s.min.z
       ),
-      new THREE.MeshBasicMaterial({ wireframe: true, color: "pink" })
+      meshMaterial
     );
     container.add(cube);
     container.add(box);
@@ -210,10 +219,33 @@ function handleKeyUp(e) {
   controls.enabled = !downKeys.has("Shift");
 }
 
-window.addEventListener("keydown", handleKeyDown);
-window.addEventListener("keyup", handleKeyUp);
-window.addEventListener("mousemove", handleMouseMove);
-window.addEventListener("click", handleClick);
+const click$ = fromEvent(renderer.domElement, "click").pipe(share());
+click$.subscribe(handleClick);
+
+const keyDown$ = fromEvent(window, "keydown").pipe(share());
+keyDown$.subscribe(handleKeyDown);
+
+const keyUp$ = fromEvent(window, "keyup").pipe(share());
+keyUp$.subscribe(handleKeyUp);
+
+const mouseMove$ = fromEvent(renderer.domElement, "mousemove").pipe(
+  throttleTime(10),
+  share()
+);
+mouseMove$.subscribe(handleMouseMove);
+
+const wheel$ = fromEvent(renderer.domElement, "wheel");
+
+merge(keyUp$, keyDown$)
+  .pipe(startWith(null))
+  .subscribe(() => (rollOverMesh.visible = downKeys.has("Shift")));
+
+merge(mouseMove$, wheel$, keyUp$, keyDown$, click$, resize$)
+  .pipe(
+    startWith(null),
+    throttleTime(10)
+  )
+  .subscribe(render);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableZoom = true;
@@ -228,9 +260,10 @@ controls.maxPolarAngle = Math.PI / 2 - 0.15;
 
 container.appendChild(renderer.domElement);
 
-function animate() {
+function render() {
   requestAnimationFrame(animate);
-  renderer.render(scene, camera);
 }
 
-requestAnimationFrame(animate);
+function animate() {
+  renderer.render(scene, camera);
+}

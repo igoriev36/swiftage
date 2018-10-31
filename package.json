@@ -11,7 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "mobx": "^5.5.2",
-    "mobx-state-tree": "^3.7.1"
+    "mobx-state-tree": "^3.7.1",
+    "rxjs": "^6.3.3",
+    "three": "^0.98.0",
+    "three-orbit-controls": "^82.1.0"
   },
   "devDependencies": {
     "@types/three": "^0.93.5",
@@ -19,6 +22,7 @@
     "typescript": "^3.1.4"
   },
   "alias": {
-    "three": ".parcel-globals/three.js"
+    "three": ".parcel-globals/three.js",
+    "three-orbit-controls": "./node_modules/three/examples/js/controls/OrbitControls"
   }
 }

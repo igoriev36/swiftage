@@ -1,15 +1,18 @@
 import { Provider } from "mobx-react";
 import * as React from "react";
 import { render } from "react-dom";
+import Editor from "./components/editor";
 import ProjectInfo from "./components/project_info";
-import Project from "./models/project";
+import { createProject } from "./models/project";
 
 class App extends React.Component {
   render() {
-    const project = Project.create({ name: "Untitled Project" });
     return (
-      <Provider project={project}>
-        <ProjectInfo />
+      <Provider project={createProject("Untitled Project")}>
+        <React.Fragment>
+          <ProjectInfo />
+          <Editor bgColor={0xeeeeee} />
+        </React.Fragment>
       </Provider>
     );
   }

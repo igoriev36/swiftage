@@ -77,14 +77,14 @@ class Editor extends React.Component<IEditor> {
 
     this.streams.mouseUp$ = fromEvent(domElement, "mouseup");
 
-    this.streams.wheel$ = fromEvent(domElement, "wheel");
+    this.streams.wheel$ = fromEvent(domElement, "wheel").pipe(share());
 
     this.streams.mouseMove$ = fromEvent(domElement, "mousemove").pipe(
       throttleTime(10),
       share()
     );
 
-    const xy$ = this.streams.mouseMove$.pipe(
+    const xy$ = merge(this.streams.mouseMove$, this.streams.wheel$).pipe(
       scan(
         (acc, event: MouseEvent) => {
           // acc.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;

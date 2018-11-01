@@ -1,7 +1,7 @@
 import { inject, observer, Provider } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
-import { fromEvent, merge } from "rxjs";
+import { animationFrameScheduler, fromEvent, merge } from "rxjs";
 import {
   concatAll,
   distinctUntilChanged,
@@ -18,6 +18,7 @@ import "three-orbit-controls";
 import { IProject } from "../../models/project";
 import ArrowHelper from "./arrow_helper";
 import Grid from "./grid";
+import Hanger from "./hanger";
 
 interface IEditor {
   project: IProject;
@@ -80,7 +81,7 @@ class Editor extends React.Component<IEditor> {
     this.streams.wheel$ = fromEvent(domElement, "wheel").pipe(share());
 
     this.streams.mouseMove$ = fromEvent(domElement, "mousemove").pipe(
-      throttleTime(10),
+      throttleTime(0, animationFrameScheduler),
       share()
     );
 
@@ -136,10 +137,10 @@ class Editor extends React.Component<IEditor> {
       this.streams.wheel$
     ).pipe(
       startWith(null),
-      throttleTime(10)
+      throttleTime(0, animationFrameScheduler)
     );
 
-    this.streams.render$.subscribe(this.render3d);
+    this.streams.render$.subscribe(this.animate);
 
     this.handleResize();
   }
@@ -176,6 +177,7 @@ class Editor extends React.Component<IEditor> {
         >
           <Grid />
           <ArrowHelper />
+          <Hanger />
         </div>
       </Provider>
     );

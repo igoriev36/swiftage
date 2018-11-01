@@ -1,12 +1,21 @@
 import { Instance, types } from "mobx-state-tree";
+import Technology from "./technology";
 
 const Project = types.model("Project", {
   name: types.string,
-  gridSize: types.number
+  technology: Technology
 });
 
 export type IProject = Instance<typeof Project>;
 
 export function createProject(name) {
-  return Project.create({ name, gridSize: 300 });
+  const project = Project.create({
+    name,
+    technology: {
+      id: "swift",
+      gridSize: 300
+    }
+  });
+  global["project"] = project;
+  return project;
 }

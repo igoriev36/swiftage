@@ -1,8 +1,9 @@
-import { inject, observer } from "mobx-react";
+import { inject, observer, Provider } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import * as THREE from "three";
 import { IProject } from "../../models/project";
+import Grid from "./grid";
 
 interface IEditor {
   project: IProject;
@@ -30,6 +31,8 @@ class Editor extends React.Component<IEditor> {
 
     this.container.appendChild(this.renderer.domElement);
 
+    console.log(this.props.project.technology.gridSize);
+
     this.handleResize();
   }
 
@@ -47,10 +50,14 @@ class Editor extends React.Component<IEditor> {
 
   render() {
     return (
-      <div
-        ref={e => (this.container = e)}
-        style={{ width: 500, height: 500 }}
-      />
+      <Provider scene={this.scene}>
+        <div
+          ref={e => (this.container = e)}
+          style={{ width: 500, height: 500 }}
+        >
+          <Grid />
+        </div>
+      </Provider>
     );
   }
 }

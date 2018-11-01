@@ -10,16 +10,34 @@ interface IProps {
 class BillOfMaterials extends React.Component<IProps> {
   render() {
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Specification</th>
-            <th>Quantity</th>
-            <th>Unit</th>
-          </tr>
-        </thead>
-      </table>
+      <div>
+        <table>
+          <tbody>
+            <tr>
+              <th>Technology</th>
+              <td>{this.props.project.technology.id}</td>
+            </tr>
+            <tr>
+              <th>Grid Size</th>
+              <td>
+                {this.props.project.technology.gridSize}
+                mm
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Specification</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     );
   }
 }

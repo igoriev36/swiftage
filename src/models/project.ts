@@ -1,9 +1,9 @@
-import { types } from "mobx-state-tree";
-import Technology from "./technology";
+import { Instance, types } from "mobx-state-tree";
 
 const Project = types.model("Project", {
-  name: types.string,
-  technology: Technology
+  name: types.string
 });
+
+export type IProject = Instance<typeof Project>;
 
 export default Project;

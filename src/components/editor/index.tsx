@@ -4,7 +4,10 @@ import { compose } from "recompose";
 import { fromEvent, merge } from "rxjs";
 import {
   concatAll,
+  distinctUntilChanged,
+  filter,
   map,
+  scan,
   share,
   startWith,
   takeUntil,
@@ -13,6 +16,7 @@ import {
 import * as THREE from "three";
 import "three-orbit-controls";
 import { IProject } from "../../models/project";
+import ArrowHelper from "./arrow_helper";
 import Grid from "./grid";
 
 interface IEditor {
@@ -24,6 +28,7 @@ class Editor extends React.Component<IEditor> {
   private camera;
   private orbitControls: THREE.OrbitControls;
   private container: HTMLDivElement;
+  private raycaster = new THREE.Raycaster();
   private renderer = new THREE.WebGLRenderer({ antialias: true });
   private scene = new THREE.Scene();
   private streams: any = {};
@@ -42,7 +47,7 @@ class Editor extends React.Component<IEditor> {
 
     this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     this.camera.position.set(-30, 100, 70);
-    this.camera.lookAt(0, 1, 0);
+    this.camera.lookAt(0, 0, 0);
 
     this.container.appendChild(domElement);
 
@@ -58,24 +63,80 @@ class Editor extends React.Component<IEditor> {
     this.orbitControls.minPolarAngle = 0.1;
     this.orbitControls.maxPolarAngle = Math.PI / 2 - 0.15;
 
+    var geometry = new THREE.PlaneBufferGeometry(80, 80);
+    geometry.rotateX(-Math.PI / 2);
+    const plane = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({ color: "green" })
+      // new THREE.ShadowMaterial({ opacity: 1 })
+    );
+    this.scene.add(plane);
+
     // setup streams
     this.streams.mouseDown$ = fromEvent(domElement, "mousedown");
 
     this.streams.mouseUp$ = fromEvent(domElement, "mouseup");
+
+    this.streams.wheel$ = fromEvent(domElement, "wheel");
 
     this.streams.mouseMove$ = fromEvent(domElement, "mousemove").pipe(
       throttleTime(10),
       share()
     );
 
+    const xy$ = this.streams.mouseMove$.pipe(
+      scan(
+        (acc, event: MouseEvent) => {
+          // acc.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
+          // acc.y =
+          //   (event.clientY / this.renderer.domElement.clientHeight) * 2 - 1;
+          acc.x = (event.layerX / 500) * 2 - 1;
+          acc.y = (event.layerY / 500) * 2 - 1;
+
+          // vector.set(acc.x, acc.y, this.camera.near);
+          return acc;
+        },
+        { x: 0, y: 0 }
+      )
+    );
+
+    const intersection$ = xy$.pipe(
+      map(xy => {
+        this.raycaster.setFromCamera(xy, this.camera);
+        return this.raycaster.intersectObject(plane).length > 0
+          ? this.raycaster.intersectObject(plane)[0]
+          : null;
+      })
+    );
+
+    const xyz$ = intersection$.pipe(
+      filter(Boolean),
+      map(i => {
+        const {
+          point: { x, y, z }
+        } = i as any;
+        return [
+          Math.floor(x / 3),
+          // Math.abs(Math.floor(y / 3)),
+          0,
+          Math.floor(z / 3) + 1
+        ];
+      }),
+      distinctUntilChanged((a, b) => a.toString() === b.toString())
+    );
+    xyz$.subscribe(console.log);
+
     this.streams.mouseDrag$ = this.streams.mouseDown$.pipe(
       map(() => this.streams.mouseMove$.pipe(takeUntil(this.streams.mouseUp$))),
       concatAll()
     );
 
-    this.streams.render$ = merge(this.streams.mouseDrag$).pipe(
+    this.streams.render$ = merge(
+      this.streams.mouseDrag$,
+      this.streams.wheel$
+    ).pipe(
       startWith(null),
-      throttleTime(20)
+      throttleTime(10)
     );
 
     this.streams.render$.subscribe(this.render3d);
@@ -102,7 +163,7 @@ class Editor extends React.Component<IEditor> {
   }
 
   render3d() {
-    console.log("render");
+    // console.log("render");
     requestAnimationFrame(this.animate);
   }
 
@@ -114,6 +175,7 @@ class Editor extends React.Component<IEditor> {
           style={{ width: 500, height: 500 }}
         >
           <Grid />
+          <ArrowHelper />
         </div>
       </Provider>
     );

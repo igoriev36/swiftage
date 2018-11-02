@@ -16,10 +16,9 @@ class Entity extends React.Component<{ scene: THREE.Scene; entity: IEntity }> {
     );
 
     reaction(
-      () => this.props.entity.position.x,
-      x => {
-        this.mesh.position.x = x;
-        console.log("updated position");
+      () => this.props.entity.xyz,
+      xyz => {
+        this.mesh.position.set(...xyz);
       }
     );
   }

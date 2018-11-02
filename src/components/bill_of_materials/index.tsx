@@ -34,14 +34,26 @@ class BillOfMaterials extends React.Component<IProps> {
               <th>SubAssembly</th>
               <th>Manufacturing Time</th>
               <th>Assembly Time</th>
-              <th>X position</th>
+              <th>X</th>
+              <th>Z</th>
               <td />
             </tr>
           </thead>
           <tbody>
             {project.entities.map(e => (
               <tr key={e.id}>
-                <td>{e.subAssembly.id}</td>
+                <td>
+                  <select
+                    value={e.subAssembly.id}
+                    onChange={evt => e.changeSubAssembly(evt.target.value)}
+                  >
+                    {project.technology.subAssemblies.map(subAssembly => (
+                      <option key={subAssembly.id} value={subAssembly.id}>
+                        {subAssembly.id}
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td>{e.subAssembly.manufacturingTime}</td>
                 <td>{e.subAssembly.assemblyTime}</td>
                 <td>
@@ -53,13 +65,21 @@ class BillOfMaterials extends React.Component<IProps> {
                   />
                 </td>
                 <td>
+                  <input
+                    value={e.position.z}
+                    onChange={evt =>
+                      e.updatePosition("z", Number(evt.target.value))
+                    }
+                  />
+                </td>
+                <td>
                   <button onClick={() => project.removeEntity(e)}>x</button>
                 </td>
               </tr>
             ))}
-            <button onClick={() => project.addEntity()}>Add Entity</button>
           </tbody>
         </table>
+        <button onClick={() => project.addEntity()}>Add Entity</button>
 
         <table>
           <thead>

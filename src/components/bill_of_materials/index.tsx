@@ -90,6 +90,13 @@ class BillOfMaterials extends React.Component<IProps> {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <th>Total</th>
+              <td>{project.total("manufacturingTime")}</td>
+              <td>{project.total("assemblyTime")}</td>
+            </tr>
+          </tfoot>
         </table>
         <button onClick={() => project.addEntity()}>Add Entity</button>
 

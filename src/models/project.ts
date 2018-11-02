@@ -2,12 +2,19 @@ import { Instance, types } from "mobx-state-tree";
 import Entity from "./entity";
 import Technology, { swift } from "./technology";
 
+const adder = (acc, curr) => acc + curr;
+
 const Project = types
   .model("Project", {
     name: types.string,
     technology: Technology,
     entities: types.array(Entity)
   })
+  .views(self => ({
+    total(key: string): number {
+      return self.entities.map(e => e.subAssembly[key]).reduce(adder);
+    }
+  }))
   .volatile(self => ({
     tool: "ORBIT"
   }))

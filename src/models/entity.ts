@@ -20,7 +20,15 @@ const Entity = types
   })
   .views(self => ({
     get validPosition() {
-      return self.position.y === 0;
+      if (self.subAssembly.id === "u") {
+        return self.position.y === 0 && self.position.z % 4 === 0;
+      } else {
+        return (
+          self.position.y > 0 &&
+          self.position.y % 4 === 0 &&
+          self.position.z % 2 === 0
+        );
+      }
     },
     get technology(): ITechnology {
       return (getRoot(self) as IProject).technology;

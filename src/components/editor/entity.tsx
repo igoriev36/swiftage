@@ -4,16 +4,14 @@ import * as React from "react";
 import { compose } from "recompose";
 import * as THREE from "three";
 import { IEntity } from "../../models/entity";
+import { entityMaterial as material } from "./materials";
 
 class Entity extends React.Component<{ scene: any; entity: IEntity }> {
   mesh;
 
   constructor(props) {
     super(props);
-    this.mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(5, 5, 5),
-      new THREE.MeshBasicMaterial({ color: "yellow" })
-    );
+    this.mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(6, 6, 6), material);
 
     reaction(
       () => this.props.entity.xyz,

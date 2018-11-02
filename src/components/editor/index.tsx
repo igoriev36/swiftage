@@ -20,7 +20,6 @@ import { IProject } from "../../models/project";
 import ArrowHelper from "./arrow_helper";
 import Entity from "./entity";
 import Grid from "./grid";
-import Hanger from "./hanger";
 
 interface IEditor {
   project: IProject;
@@ -36,6 +35,7 @@ class Editor extends React.Component<IEditor> {
   private scene = new THREE.Scene();
   private sceneActions: any;
   private streams: any = {};
+  private objectsToRaycast = [];
 
   constructor(props) {
     super(props);
@@ -65,6 +65,7 @@ class Editor extends React.Component<IEditor> {
     // add orbit controls
     this.orbitControls = new THREE.OrbitControls(this.camera, domElement);
     this.orbitControls.enableZoom = true;
+    this.orbitControls.enableKeys = false;
     this.orbitControls.enableDamping = true;
     this.orbitControls.minDistance = 4;
     this.orbitControls.maxDistance = 200;
@@ -82,6 +83,7 @@ class Editor extends React.Component<IEditor> {
       // new THREE.ShadowMaterial({ opacity: 1 })
     );
     this.scene.add(plane);
+    this.objectsToRaycast = [plane];
 
     // setup streams
     this.streams.mouseDown$ = fromEvent(domElement, "mousedown");
@@ -111,31 +113,53 @@ class Editor extends React.Component<IEditor> {
       )
     );
 
+    const hanger = new THREE.Mesh(
+      new THREE.BoxGeometry(6, 6, 6),
+      new THREE.MeshNormalMaterial()
+    );
+    hanger.translateY(3);
+    this.scene.add(hanger);
+
     const intersection$ = xy$.pipe(
       map(xy => {
         this.raycaster.setFromCamera(xy, this.camera);
-        return this.raycaster.intersectObject(plane).length > 0
-          ? this.raycaster.intersectObject(plane)[0]
-          : null;
-      })
+        if (this.props.project.tool === "ORBIT") {
+          return this.raycaster.intersectObject(plane).length > 0
+            ? this.raycaster.intersectObject(plane)[0]
+            : null;
+        } else {
+          return this.raycaster.intersectObject(hanger).length > 0
+            ? this.raycaster.intersectObject(hanger)[0]
+            : null;
+        }
+      }),
+      distinctUntilChanged()
     );
 
-    const xyz$ = intersection$.pipe(
+    const extrudeNormals$ = intersection$.pipe(
       filter(Boolean),
-      map(i => {
-        const {
-          point: { x, y, z }
-        } = i as any;
-        return [
-          Math.floor(x / 3),
-          // Math.abs(Math.floor(y / 3)),
-          0,
-          Math.floor(z / 3) + 1
-        ];
-      }),
-      distinctUntilChanged((a, b) => a.toString() === b.toString())
+      map(i => i.face.normal),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
     );
-    xyz$.subscribe(console.log);
+
+    extrudeNormals$.subscribe(console.log);
+
+    // const xyz$ = intersection$.pipe(
+    //   filter(Boolean),
+    //   map(i => {
+    //     const {
+    //       point: { x, y, z }
+    //     } = i as any;
+    //     return [
+    //       Math.floor(x / 3),
+    //       // Math.abs(Math.floor(y / 3)),
+    //       0,
+    //       Math.floor(z / 3) + 1
+    //     ];
+    //   }),
+    //   distinctUntilChanged((a, b) => a.toString() === b.toString())
+    // );
+    // xyz$.subscribe(console.log);
 
     reaction(
       () => this.props.project.tool,
@@ -183,15 +207,6 @@ class Editor extends React.Component<IEditor> {
     this.render3d();
   }
 
-  animate() {
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  render3d() {
-    // console.log("render");
-    requestAnimationFrame(this.animate);
-  }
-
   add(thing) {
     this.scene.add(thing);
     this.render3d();
@@ -200,6 +215,15 @@ class Editor extends React.Component<IEditor> {
   remove(thing) {
     this.scene.remove(thing);
     this.render3d();
+  }
+
+  animate() {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  render3d() {
+    // console.log("render");
+    requestAnimationFrame(this.animate);
   }
 
   render() {
@@ -211,7 +235,7 @@ class Editor extends React.Component<IEditor> {
         >
           <Grid />
           <ArrowHelper />
-          <Hanger />
+          {/* <Hanger /> */}
           {this.props.project.entities.map(entity => (
             <Entity key={entity.id} entity={entity} />
           ))}

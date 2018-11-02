@@ -45,6 +45,7 @@ const Entity = types
   }))
   .actions(self => ({
     updatePosition(axis: xyz, val: number) {
+      if (axis === "y" && val < 0) return;
       self.position[axis] = val;
     },
     // changeSubAssembly(subAssembly: ISubAssembly) {

@@ -17,6 +17,8 @@ class Grid extends React.Component<{ scene: Scene; project: IProject }> {
       new Color(0xdddddd),
       new Color(0xdddddd)
     );
+    this.mesh.position.x = this.props.project.technology.gridSize / 100 / 2;
+    this.mesh.position.z = this.props.project.technology.gridSize / 100 / 2;
   }
 
   componentDidMount() {

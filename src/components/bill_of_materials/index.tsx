@@ -35,6 +35,7 @@ class BillOfMaterials extends React.Component<IProps> {
               <th>Manufacturing Time</th>
               <th>Assembly Time</th>
               <th>X</th>
+              <th>Y</th>
               <th>Z</th>
               <td />
             </tr>
@@ -58,6 +59,7 @@ class BillOfMaterials extends React.Component<IProps> {
                 <td>{e.subAssembly.assemblyTime}</td>
                 <td>
                   <input
+                    type="number"
                     value={e.position.x}
                     onChange={evt =>
                       e.updatePosition("x", Number(evt.target.value))
@@ -66,6 +68,16 @@ class BillOfMaterials extends React.Component<IProps> {
                 </td>
                 <td>
                   <input
+                    type="number"
+                    value={e.position.y}
+                    onChange={evt =>
+                      e.updatePosition("y", Number(evt.target.value))
+                    }
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
                     value={e.position.z}
                     onChange={evt =>
                       e.updatePosition("z", Number(evt.target.value))

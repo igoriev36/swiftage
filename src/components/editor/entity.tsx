@@ -14,7 +14,7 @@ class Entity extends React.Component<{
   entity: IEntity;
 }> {
   mesh: THREE.Mesh;
-  geometry;
+  geometry: THREE.ExtrudeBufferGeometry;
 
   constructor(props) {
     super(props);
@@ -72,12 +72,23 @@ class Entity extends React.Component<{
       steps: 1
     };
     this.geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+
     this.geometry.computeVertexNormals();
     setUpBarycentricCoordinates(this.geometry);
+
+    // store buffergeometry in model instead, share when possible, only calculate it when required.
+    const n = this.geometry.attributes.normal.array;
+    const p = this.geometry.attributes.position.array;
+    const c = this.geometry.attributes.center.array;
+    var g = new THREE.BufferGeometry();
+    g.addAttribute("normal", new THREE.BufferAttribute(n, 3));
+    g.addAttribute("position", new THREE.BufferAttribute(p, 3));
+    g.addAttribute("center", new THREE.BufferAttribute(c, 3));
+
     if (this.mesh) {
-      this.mesh.geometry = this.geometry;
+      this.mesh.geometry = g;
     } else {
-      this.mesh = new THREE.Mesh(this.geometry, entityMaterial);
+      this.mesh = new THREE.Mesh(g, entityMaterial);
     }
   }
 

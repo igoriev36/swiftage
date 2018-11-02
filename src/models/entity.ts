@@ -21,12 +21,17 @@ const Entity = types
   .views(self => ({
     get validPosition() {
       if (self.subAssembly.id === "u") {
-        return self.position.y === 0 && self.position.z % 4 === 0;
+        return (
+          self.position.y === 0 &&
+          self.position.z % 4 === 0 &&
+          self.position.x % 16 === 0
+        );
       } else {
         return (
           self.position.y > 0 &&
           self.position.y % 4 === 0 &&
-          self.position.z % 2 === 0
+          self.position.z % 2 === 0 &&
+          self.position.x % 16 === 0
         );
       }
     },

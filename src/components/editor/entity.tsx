@@ -1,3 +1,4 @@
+import { reaction } from "mobx";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
@@ -13,7 +14,14 @@ class Entity extends React.Component<{ scene: THREE.Scene; entity: IEntity }> {
       new THREE.BoxGeometry(5, 5, 5),
       new THREE.MeshBasicMaterial({ color: "yellow" })
     );
-    // this.mesh.position.this.props.entity.position;
+
+    reaction(
+      () => this.props.entity.position.x,
+      x => {
+        this.mesh.position.x = x;
+        console.log("updated position");
+      }
+    );
   }
 
   componentDidMount() {

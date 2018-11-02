@@ -11,6 +11,14 @@ const Project = types
   .actions(self => ({
     removeEntity(entity) {
       self.entities = self.entities.filter(e => e !== entity);
+    },
+    addEntity() {
+      self.entities.push(
+        Entity.create({
+          id: Math.random().toString(),
+          subAssembly: swift.subAssemblies[0]
+        })
+      );
     }
   }));
 
@@ -24,7 +32,6 @@ export function createProject(name) {
       Entity.create({
         id: "first",
         subAssembly: swift.subAssemblies[0],
-        position: { x: 0, y: 0 },
         normal: { x: 0, y: 0, z: 1 }
       })
     ]

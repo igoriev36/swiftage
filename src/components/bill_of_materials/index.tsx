@@ -9,18 +9,19 @@ interface IProps {
 
 class BillOfMaterials extends React.Component<IProps> {
   render() {
+    const { project } = this.props;
     return (
       <div>
         <table>
           <tbody>
             <tr>
               <th>Technology</th>
-              <td>{this.props.project.technology.id}</td>
+              <td>{project.technology.id}</td>
             </tr>
             <tr>
               <th>Grid Size</th>
               <td>
-                {this.props.project.technology.gridSize}
+                {project.technology.gridSize}
                 mm
               </td>
             </tr>
@@ -33,22 +34,30 @@ class BillOfMaterials extends React.Component<IProps> {
               <th>SubAssembly</th>
               <th>Manufacturing Time</th>
               <th>Assembly Time</th>
+              <th>X position</th>
               <td />
             </tr>
           </thead>
           <tbody>
-            {this.props.project.entities.map(e => (
+            {project.entities.map(e => (
               <tr key={e.id}>
                 <td>{e.subAssembly.id}</td>
                 <td>{e.subAssembly.manufacturingTime}</td>
                 <td>{e.subAssembly.assemblyTime}</td>
                 <td>
-                  <button onClick={() => this.props.project.removeEntity(e)}>
-                    x
-                  </button>
+                  <input
+                    value={e.position.x}
+                    onChange={evt =>
+                      e.updatePosition("x", Number(evt.target.value))
+                    }
+                  />
+                </td>
+                <td>
+                  <button onClick={() => project.removeEntity(e)}>x</button>
                 </td>
               </tr>
             ))}
+            <button onClick={() => project.addEntity()}>Add Entity</button>
           </tbody>
         </table>
 

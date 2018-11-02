@@ -17,6 +17,7 @@ import * as THREE from "three";
 import "three-orbit-controls";
 import { IProject } from "../../models/project";
 import ArrowHelper from "./arrow_helper";
+import Entity from "./entity";
 import Grid from "./grid";
 import Hanger from "./hanger";
 
@@ -178,6 +179,9 @@ class Editor extends React.Component<IEditor> {
           <Grid />
           <ArrowHelper />
           <Hanger />
+          {this.props.project.entities.map(entity => (
+            <Entity key={entity.id} entity={entity} />
+          ))}
         </div>
       </Provider>
     );

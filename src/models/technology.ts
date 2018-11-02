@@ -12,7 +12,8 @@ export const swift = Technology.create({
   gridSize: 300,
   subAssemblies: [
     {
-      id: "u"
+      id: "u",
+      points: [[0, 0], [3, 0], [3, 3], [0, 3]]
     }
   ]
 });

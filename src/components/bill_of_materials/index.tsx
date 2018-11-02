@@ -30,6 +30,31 @@ class BillOfMaterials extends React.Component<IProps> {
         <table>
           <thead>
             <tr>
+              <th>SubAssembly</th>
+              <th>Manufacturing Time</th>
+              <th>Assembly Time</th>
+              <td />
+            </tr>
+          </thead>
+          <tbody>
+            {this.props.project.entities.map(e => (
+              <tr key={e.id}>
+                <td>{e.subAssembly.id}</td>
+                <td>{e.subAssembly.manufacturingTime}</td>
+                <td>{e.subAssembly.assemblyTime}</td>
+                <td>
+                  <button onClick={() => this.props.project.removeEntity(e)}>
+                    x
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr>
               <th>Item</th>
               <th>Specification</th>
               <th>Quantity</th>

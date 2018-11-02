@@ -55,7 +55,7 @@ export function createProject(name) {
       Entity.create({
         id: "first",
         subAssembly: swift.subAssemblies[0],
-        normal: { x: 0, y: 0, z: 1 }
+        normal: { x: -3, y: 0, z: 1 }
       })
     ]
   });

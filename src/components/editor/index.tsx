@@ -79,7 +79,7 @@ class Editor extends React.Component<IEditor> {
     geometry.rotateX(-Math.PI / 2);
     const plane = new THREE.Mesh(
       geometry,
-      new THREE.MeshBasicMaterial({ color: "green" })
+      new THREE.MeshBasicMaterial({ color: "green", visible: false })
       // new THREE.ShadowMaterial({ opacity: 1 })
     );
     this.scene.add(plane);
@@ -113,12 +113,12 @@ class Editor extends React.Component<IEditor> {
       )
     );
 
-    const hanger = new THREE.Mesh(
-      new THREE.BoxGeometry(6, 6, 6),
-      new THREE.MeshNormalMaterial()
-    );
-    hanger.translateY(3);
-    this.scene.add(hanger);
+    // const hanger = new THREE.Mesh(
+    //   new THREE.BoxGeometry(6, 6, 6),
+    //   new THREE.MeshNormalMaterial()
+    // );
+    // hanger.translateY(3);
+    // this.scene.add(hanger);
 
     const intersection$ = xy$.pipe(
       map(xy => {
@@ -128,9 +128,10 @@ class Editor extends React.Component<IEditor> {
             ? this.raycaster.intersectObject(plane)[0]
             : null;
         } else {
-          return this.raycaster.intersectObject(hanger).length > 0
-            ? this.raycaster.intersectObject(hanger)[0]
-            : null;
+          // return this.raycaster.intersectObject(hanger).length > 0
+          //   ? this.raycaster.intersectObject(hanger)[0]
+          //   : null;
+          return null;
         }
       }),
       distinctUntilChanged()

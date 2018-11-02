@@ -4,14 +4,21 @@ import * as React from "react";
 import { compose } from "recompose";
 import * as THREE from "three";
 import { IEntity } from "../../models/entity";
+import { IProject } from "../../models/project";
 import { entityMaterial as material } from "./materials";
+import { setUpBarycentricCoordinates } from "./utils";
 
-class Entity extends React.Component<{ scene: any; entity: IEntity }> {
+class Entity extends React.Component<{
+  scene: any;
+  project: IProject;
+  entity: IEntity;
+}> {
   mesh;
+  geometry;
 
   constructor(props) {
     super(props);
-    this.mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(6, 6, 6), material);
+    this.draw = this.draw.bind(this);
 
     reaction(
       () => this.props.entity.xyz,
@@ -20,6 +27,46 @@ class Entity extends React.Component<{ scene: any; entity: IEntity }> {
         this.props.scene.render();
       }
     );
+
+    reaction(
+      () => this.props.entity.subAssembly,
+      xyz => {
+        this.draw(true);
+        this.props.scene.render();
+      }
+    );
+
+    this.draw();
+  }
+
+  draw(remove = false) {
+    // if (remove) {
+    //   this.props.scene.remove(this.mesh)
+    // }
+
+    const shape = new THREE.Shape();
+    this.props.entity.subAssembly.points
+      .map(([x, y]) => [
+        (x * this.props.project.technology.gridSize) / 100,
+        (y * this.props.project.technology.gridSize) / 100
+      ])
+      .forEach(([x, y], index) => {
+        if (index == 0) shape.moveTo(x, y);
+        else shape.lineTo(x, y);
+      });
+    const extrudeSettings = {
+      depth: 12,
+      bevelEnabled: false,
+      steps: 1
+    };
+    this.geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+    this.geometry.computeVertexNormals();
+    setUpBarycentricCoordinates(this.geometry);
+    if (this.mesh) {
+      this.mesh.geometry = this.geometry;
+    } else {
+      this.mesh = new THREE.Mesh(this.geometry, material);
+    }
   }
 
   componentDidMount() {
@@ -36,6 +83,6 @@ class Entity extends React.Component<{ scene: any; entity: IEntity }> {
 }
 
 export default compose(
-  inject("scene"),
+  inject("project", "scene"),
   observer
 )(Entity);

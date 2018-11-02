@@ -4,6 +4,7 @@ import { render } from "react-dom";
 import BillOfMaterials from "./components/bill_of_materials";
 import Editor from "./components/editor";
 import ProjectInfo from "./components/project_info";
+import Toolbar from "./components/toolbar";
 import { createProject } from "./models/project";
 
 class App extends React.Component {
@@ -12,6 +13,7 @@ class App extends React.Component {
       <Provider project={createProject("Untitled Project")}>
         <React.Fragment>
           <ProjectInfo />
+          <Toolbar />
           <Editor bgColor={0xeeeeee} />
           <BillOfMaterials />
         </React.Fragment>

@@ -19,6 +19,9 @@ const Entity = types
     normal: types.optional(Vector, { x: 0, y: 0, z: 0 })
   })
   .views(self => ({
+    get validPosition() {
+      return self.position.y === 0;
+    },
     get technology(): ITechnology {
       return (getRoot(self) as IProject).technology;
     },

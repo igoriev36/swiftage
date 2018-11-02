@@ -54,6 +54,12 @@ class BillOfMaterials extends React.Component<IProps> {
                       </option>
                     ))}
                   </select>
+                  <select>
+                    <option value="default">Default</option>
+                  </select>
+                  <select>
+                    <option value={16}>4.8m</option>
+                  </select>
                 </td>
                 <td>{e.subAssembly.manufacturingTime}</td>
                 <td>{e.subAssembly.assemblyTime}</td>

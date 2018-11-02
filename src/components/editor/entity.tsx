@@ -5,7 +5,7 @@ import { compose } from "recompose";
 import * as THREE from "three";
 import { IEntity } from "../../models/entity";
 import { IProject } from "../../models/project";
-import { entityMaterial as material } from "./materials";
+import { entityMaterial, invalidEntityMaterial } from "./materials";
 import { setUpBarycentricCoordinates } from "./utils";
 
 class Entity extends React.Component<{
@@ -13,7 +13,7 @@ class Entity extends React.Component<{
   project: IProject;
   entity: IEntity;
 }> {
-  mesh;
+  mesh: THREE.Mesh;
   geometry;
 
   constructor(props) {
@@ -24,6 +24,18 @@ class Entity extends React.Component<{
       () => this.props.entity.xyz,
       xyz => {
         this.mesh.position.set(...xyz);
+        this.props.scene.render();
+      }
+    );
+
+    reaction(
+      () => this.props.entity.validPosition,
+      valid => {
+        if (valid) {
+          this.mesh.material = entityMaterial;
+        } else {
+          this.mesh.material = invalidEntityMaterial;
+        }
         this.props.scene.render();
       }
     );
@@ -65,7 +77,7 @@ class Entity extends React.Component<{
     if (this.mesh) {
       this.mesh.geometry = this.geometry;
     } else {
-      this.mesh = new THREE.Mesh(this.geometry, material);
+      this.mesh = new THREE.Mesh(this.geometry, entityMaterial);
     }
   }
 

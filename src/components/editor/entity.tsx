@@ -5,7 +5,7 @@ import { compose } from "recompose";
 import * as THREE from "three";
 import { IEntity } from "../../models/entity";
 
-class Entity extends React.Component<{ scene: THREE.Scene; entity: IEntity }> {
+class Entity extends React.Component<{ scene: any; entity: IEntity }> {
   mesh;
 
   constructor(props) {
@@ -19,6 +19,7 @@ class Entity extends React.Component<{ scene: THREE.Scene; entity: IEntity }> {
       () => this.props.entity.xyz,
       xyz => {
         this.mesh.position.set(...xyz);
+        this.props.scene.render();
       }
     );
   }

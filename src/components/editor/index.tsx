@@ -34,13 +34,21 @@ class Editor extends React.Component<IEditor> {
   private raycaster = new THREE.Raycaster();
   private renderer = new THREE.WebGLRenderer({ antialias: true });
   private scene = new THREE.Scene();
+  private sceneActions: any;
   private streams: any = {};
 
   constructor(props) {
     super(props);
-    this.render3d = this.render3d.bind(this);
+    this.add = this.add.bind(this);
     this.animate = this.animate.bind(this);
     this.handleResize = this.handleResize.bind(this);
+    this.remove = this.remove.bind(this);
+    this.render3d = this.render3d.bind(this);
+    this.sceneActions = {
+      add: this.add,
+      remove: this.remove,
+      render: this.render3d
+    };
   }
 
   componentDidMount() {
@@ -65,20 +73,6 @@ class Editor extends React.Component<IEditor> {
     (this.orbitControls as any).panSpeed = 0.2;
     this.orbitControls.minPolarAngle = 0.1;
     this.orbitControls.maxPolarAngle = Math.PI / 2 - 0.15;
-
-    reaction(
-      () => this.props.project.tool,
-      tool => {
-        switch (tool) {
-          case "ORBIT":
-            this.orbitControls.enabled = true;
-            break;
-          default:
-            this.orbitControls.enabled = false;
-            break;
-        }
-      }
-    );
 
     var geometry = new THREE.PlaneBufferGeometry(80, 80);
     geometry.rotateX(-Math.PI / 2);
@@ -143,6 +137,20 @@ class Editor extends React.Component<IEditor> {
     );
     xyz$.subscribe(console.log);
 
+    reaction(
+      () => this.props.project.tool,
+      tool => {
+        switch (tool) {
+          case "ORBIT":
+            this.orbitControls.enabled = true;
+            break;
+          default:
+            this.orbitControls.enabled = false;
+            break;
+        }
+      }
+    );
+
     this.streams.mouseDrag$ = this.streams.mouseDown$.pipe(
       map(() => this.streams.mouseMove$.pipe(takeUntil(this.streams.mouseUp$))),
       concatAll()
@@ -162,9 +170,9 @@ class Editor extends React.Component<IEditor> {
   }
 
   componentWillUnmount() {
-    Object.keys(this.streams).forEach(key => {
-      this.streams[key].unsubscribe();
-    });
+    // Object.keys(this.streams).forEach(key => {
+    //   this.streams[key].unsubscribe();
+    // });
   }
 
   handleResize(event = null) {
@@ -184,9 +192,19 @@ class Editor extends React.Component<IEditor> {
     requestAnimationFrame(this.animate);
   }
 
+  add(thing) {
+    this.scene.add(thing);
+    this.render3d();
+  }
+
+  remove(thing) {
+    this.scene.remove(thing);
+    this.render3d();
+  }
+
   render() {
     return (
-      <Provider scene={this.scene}>
+      <Provider scene={this.sceneActions}>
         <div
           ref={e => (this.container = e)}
           style={{ width: 500, height: 500 }}

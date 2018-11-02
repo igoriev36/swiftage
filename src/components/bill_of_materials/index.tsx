@@ -1,7 +1,7 @@
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
-import { IProject } from "../../models/project";
+import { IProject, undoManager } from "../../models/project";
 
 interface IProps {
   project: IProject;
@@ -12,6 +12,19 @@ class BillOfMaterials extends React.Component<IProps> {
     const { project } = this.props;
     return (
       <div>
+        <button
+          disabled={!undoManager.canUndo}
+          onClick={() => undoManager.undo()}
+        >
+          UNDO
+        </button>
+        <button
+          disabled={!undoManager.canRedo}
+          onClick={() => undoManager.redo()}
+        >
+          REDO
+        </button>
+
         <table>
           <tbody>
             <tr>
@@ -99,7 +112,6 @@ class BillOfMaterials extends React.Component<IProps> {
           </tfoot>
         </table>
         <button onClick={() => project.addEntity()}>Add Entity</button>
-
         <table>
           <thead>
             <tr>

@@ -15,6 +15,18 @@ class BillOfMaterials extends React.Component<IProps> {
         <table>
           <tbody>
             <tr>
+              <th>Tool</th>
+              <td>
+                <select
+                  value={project.tool}
+                  onChange={e => project.setTool(e.target.value)}
+                >
+                  <option value="EXTRUDE">Extrude</option>
+                  <option value="ORBIT">Orbit</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
               <th>Technology</th>
               <td>{project.technology.id}</td>
             </tr>

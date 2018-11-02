@@ -1,3 +1,4 @@
+import { reaction } from "mobx";
 import { inject, observer, Provider } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
@@ -64,6 +65,20 @@ class Editor extends React.Component<IEditor> {
     (this.orbitControls as any).panSpeed = 0.2;
     this.orbitControls.minPolarAngle = 0.1;
     this.orbitControls.maxPolarAngle = Math.PI / 2 - 0.15;
+
+    reaction(
+      () => this.props.project.tool,
+      tool => {
+        switch (tool) {
+          case "ORBIT":
+            this.orbitControls.enabled = true;
+            break;
+          default:
+            this.orbitControls.enabled = false;
+            break;
+        }
+      }
+    );
 
     var geometry = new THREE.PlaneBufferGeometry(80, 80);
     geometry.rotateX(-Math.PI / 2);

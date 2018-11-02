@@ -8,7 +8,13 @@ const Project = types
     technology: Technology,
     entities: types.array(Entity)
   })
+  .volatile(self => ({
+    tool: "ORBIT"
+  }))
   .actions(self => ({
+    setTool(toolName: string) {
+      self.tool = toolName;
+    },
     removeEntity(entity) {
       self.entities = self.entities.filter(e => e !== entity);
     },

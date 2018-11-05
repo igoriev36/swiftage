@@ -3,13 +3,23 @@ import { inject, observer, Provider } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import { animationFrameScheduler, fromEvent, merge } from "rxjs";
-import { concatAll, distinctUntilChanged, filter, map, scan, share, startWith, takeUntil, throttleTime } from "rxjs/operators";
+import {
+  concatAll,
+  distinctUntilChanged,
+  filter,
+  map,
+  scan,
+  share,
+  startWith,
+  takeUntil,
+  throttleTime
+} from "rxjs/operators";
 import * as THREE from "three";
 import "three-orbit-controls";
 import { IProject } from "../../models/project";
-import ArrowHelper from "./arrow_helper";
-import Entity from "./entity";
-import Grid from "./grid";
+import ArrowHelper from "./components/arrow_helper";
+import Entity from "./components/entity";
+import Grid from "./components/grid";
 
 interface IEditor {
   bgColor: number;

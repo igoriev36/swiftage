@@ -2,7 +2,7 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import { Color, GridHelper, Scene } from "three";
-import { IProject } from "../../models/project";
+import { IProject } from "../../../models/project";
 
 const NUMBER_OF_GRIDS = 51;
 

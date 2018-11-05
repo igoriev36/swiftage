@@ -3,10 +3,10 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import * as THREE from "three";
-import { IEntity } from "../../models/entity";
-import { IProject } from "../../models/project";
-import { entityMaterial, invalidEntityMaterial } from "./materials";
-import { setUpBarycentricCoordinates } from "./utils";
+import { IEntity } from "../../../models/entity";
+import { IProject } from "../../../models/project";
+import { entityMaterial, invalidEntityMaterial } from "../materials";
+import { setUpBarycentricCoordinates } from "../utils";
 
 class Entity extends React.Component<{
   entity: IEntity;

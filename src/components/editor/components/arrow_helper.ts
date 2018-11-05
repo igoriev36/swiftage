@@ -2,7 +2,7 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import { ArrowHelper as ThreeArrowHelper, Scene, Vector3 } from "three";
-import { IProject } from "../../models/project";
+import { IProject } from "../../../models/project";
 
 class ArrowHelper extends React.Component<{ scene: Scene; project: IProject }> {
   mesh;

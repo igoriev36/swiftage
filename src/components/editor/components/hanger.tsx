@@ -2,7 +2,7 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import { BoxGeometry, Mesh, MeshNormalMaterial, Scene } from "three";
-import { IProject } from "../../models/project";
+import { IProject } from "../../../models/project";
 
 class Hanger extends React.Component<{ scene: Scene; project: IProject }> {
   mesh;

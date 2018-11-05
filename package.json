@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel public/index.html --no-hmr"
+    "start": "parcel public/index.html --no-hmr",
+    "build": "parcel build public/index.html --experimental-scope-hoisting --public-url=.",
+    "clean": "rm -rf dist .cache",
+    "predeploy": "yarn clean && yarn build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
@@ -25,10 +29,12 @@
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
     "@types/three": "^0.93.5",
+    "gh-pages": "^2.0.1",
     "parcel-bundler": "^1.10.3",
     "typescript": "^3.1.4"
   },
   "alias": {
+    "react": ".parcel-globals/react.js",
     "three": ".parcel-globals/three.js",
     "three-orbit-controls": "./node_modules/three/examples/js/controls/OrbitControls"
   }

@@ -2,6 +2,8 @@ import * as THREE from "three";
 
 // export const entityMaterial = new THREE.MeshBasicMaterial({ color: "yellow" });
 
+export const normalMaterial = new THREE.MeshNormalMaterial();
+
 const vertexShader = `
 attribute vec3 center;
 varying vec3 vCenter;

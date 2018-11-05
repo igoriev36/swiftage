@@ -20,6 +20,7 @@ import { IProject } from "../../models/project";
 import ArrowHelper from "./components/arrow_helper";
 import Entity from "./components/entity";
 import Grid from "./components/grid";
+import { normalMaterial } from "./materials";
 
 interface IEditor {
   bgColor: number;
@@ -36,6 +37,8 @@ class Editor extends React.Component<IEditor> {
   private scene = new THREE.Scene();
   private sceneActions: any;
   private streams: any = {};
+
+  private hanger: THREE.Mesh;
 
   constructor(props) {
     super(props);
@@ -115,12 +118,12 @@ class Editor extends React.Component<IEditor> {
       )
     );
 
-    // const hanger = new THREE.Mesh(
-    //   new THREE.BoxGeometry(6, 6, 6),
-    //   new THREE.MeshNormalMaterial()
-    // );
-    // hanger.translateY(3);
-    // this.scene.add(hanger);
+    this.hanger = new THREE.Mesh(
+      new THREE.BoxGeometry(18, 18, 18),
+      normalMaterial
+    );
+    this.hanger.translateY(9);
+    this.scene.add(this.hanger);
 
     const intersection$ = xy$.pipe(
       map(xy => {

@@ -3,17 +3,7 @@ import { inject, observer, Provider } from "mobx-react";
 import * as React from "react";
 import { compose } from "recompose";
 import { animationFrameScheduler, fromEvent, merge } from "rxjs";
-import {
-  concatAll,
-  distinctUntilChanged,
-  filter,
-  map,
-  scan,
-  share,
-  startWith,
-  takeUntil,
-  throttleTime
-} from "rxjs/operators";
+import { concatAll, distinctUntilChanged, filter, map, scan, share, startWith, takeUntil, throttleTime } from "rxjs/operators";
 import * as THREE from "three";
 import "three-orbit-controls";
 import { IProject } from "../../models/project";
@@ -22,28 +12,30 @@ import Entity from "./entity";
 import Grid from "./grid";
 
 interface IEditor {
-  project: IProject;
   bgColor: number;
+  project: IProject;
 }
 
 class Editor extends React.Component<IEditor> {
   private camera;
-  private orbitControls: THREE.OrbitControls;
   private container: HTMLDivElement;
+  private objectsToRaycast: THREE.Object3D[];
+  private orbitControls: THREE.OrbitControls;
   private raycaster = new THREE.Raycaster();
   private renderer = new THREE.WebGLRenderer({ antialias: true });
   private scene = new THREE.Scene();
   private sceneActions: any;
   private streams: any = {};
-  private objectsToRaycast = [];
 
   constructor(props) {
     super(props);
+
     this.add = this.add.bind(this);
     this.animate = this.animate.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.remove = this.remove.bind(this);
     this.render3d = this.render3d.bind(this);
+
     this.sceneActions = {
       add: this.add,
       remove: this.remove,
@@ -64,16 +56,16 @@ class Editor extends React.Component<IEditor> {
 
     // add orbit controls
     this.orbitControls = new THREE.OrbitControls(this.camera, domElement);
-    this.orbitControls.enableZoom = true;
-    this.orbitControls.enableKeys = false;
-    this.orbitControls.enableDamping = true;
-    this.orbitControls.minDistance = 4;
-    this.orbitControls.maxDistance = 200;
     this.orbitControls.dampingFactor = 0.25;
-    this.orbitControls.rotateSpeed = 0.4;
-    (this.orbitControls as any).panSpeed = 0.2;
-    this.orbitControls.minPolarAngle = 0.1;
+    this.orbitControls.enableDamping = true;
+    this.orbitControls.enableKeys = false;
+    this.orbitControls.enableZoom = true;
+    this.orbitControls.maxDistance = 200;
     this.orbitControls.maxPolarAngle = Math.PI / 2 - 0.15;
+    this.orbitControls.minDistance = 4;
+    this.orbitControls.minPolarAngle = 0.1;
+    (this.orbitControls as any).panSpeed = 0.2;
+    this.orbitControls.rotateSpeed = 0.4;
 
     var geometry = new THREE.PlaneBufferGeometry(80, 80);
     geometry.rotateX(-Math.PI / 2);

@@ -9,9 +9,9 @@ import { entityMaterial, invalidEntityMaterial } from "./materials";
 import { setUpBarycentricCoordinates } from "./utils";
 
 class Entity extends React.Component<{
-  scene: any;
-  project: IProject;
   entity: IEntity;
+  project: IProject;
+  scene: any;
 }> {
   mesh: THREE.Mesh;
   geometry: THREE.ExtrudeBufferGeometry;
@@ -22,8 +22,8 @@ class Entity extends React.Component<{
 
     reaction(
       () => this.props.entity.xyz,
-      xyz => {
-        this.mesh.position.set(...xyz);
+      ([x, y, z]) => {
+        this.mesh.position.set(x, y, z);
         this.props.scene.render();
       }
     );
@@ -80,7 +80,8 @@ class Entity extends React.Component<{
     const n = this.geometry.attributes.normal.array;
     const p = this.geometry.attributes.position.array;
     const c = this.geometry.attributes.center.array;
-    var g = new THREE.BufferGeometry();
+
+    const g = new THREE.BufferGeometry();
     g.addAttribute("normal", new THREE.BufferAttribute(n, 3));
     g.addAttribute("position", new THREE.BufferAttribute(p, 3));
     g.addAttribute("center", new THREE.BufferAttribute(c, 3));
@@ -105,7 +106,7 @@ class Entity extends React.Component<{
   }
 }
 
-export default compose(
+export default compose<{}, { entity: IEntity }>(
   inject("project", "scene"),
   observer
 )(Entity);

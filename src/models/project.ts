@@ -23,7 +23,7 @@ const Project = types
     }
   }))
   .volatile(self => ({
-    tool: "ORBIT"
+    tool: "EXTRUDE"
   }))
   .actions(self => {
     setUndoManager(self);

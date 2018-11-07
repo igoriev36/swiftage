@@ -24,7 +24,7 @@
     "recompose": "^0.30.0",
     "rxjs": "^6.3.3",
     "three": "^0.98.0",
-    "three-orbit-controls": "^82.1.0"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/react": "^16.4.18",

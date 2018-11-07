@@ -20,6 +20,16 @@ const Project = types
   .views(self => ({
     total(key: string): number {
       return self.entities.map(e => e.subAssembly[key]).reduce(adder);
+    },
+    get cursor() {
+      switch (self.tool) {
+        case "EXTRUDE":
+          return "col-resize";
+        case "ORBIT":
+          return "-webkit-grab";
+        default:
+          return "inherit";
+      }
     }
   }))
   .volatile(self => ({
